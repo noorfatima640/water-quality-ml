@@ -185,3 +185,30 @@ plt.show()
 
 df_year[["Temperature", "WQI"]].corr()
 
+from sklearn.linear_model import LinearRegression
+
+# 1. Yearly averages for Temperature and WQI
+df_year = df.groupby("Year")[["Temperature", "WQI"]].mean().reset_index()
+
+# 2. Fit a linear model for long-term Temperature trend
+model = LinearRegression()
+model.fit(df_year[["Year"]], df_year["Temperature"])
+
+# 3. Create future years up to 2050
+future_years = pd.DataFrame({"Year": np.arange(df_year["Year"].max() + 1, 2051)})
+future_years["Temp_Forecast"] = model.predict(future_years[["Year"]])
+
+# 4. Plot historical vs trend to 2050
+plt.figure(figsize=(12,5))
+plt.plot(df_year["Year"], df_year["Temperature"], linewidth=2, label="Historical")
+plt.plot(future_years["Year"], future_years["Temp_Forecast"], "--", label="Trend Forecast")
+plt.title("Temperature Trend (Historical + Forecast)")
+plt.xlabel("Year")
+plt.ylabel("Mean Temperature (standardised)")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+# 5. Correlation between Temperature and WQI
+df[["Temperature", "WQI"]].corr()
+
